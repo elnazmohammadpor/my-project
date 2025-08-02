@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barcelona todolist</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0f3c 50%, #7a0623 50%);
+      height: 100vh;
+      position: relative;
+    }
+
+    .logo {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 100px;
+    }
+
+    .todo {
+      background-color: white;
+      width: 500px;
+      padding: 15px;
+      border: 2px solid #0a0f3c;
+      border-radius: 10px;
+      margin: 100px auto;
+      box-shadow: 10px 20px rgba black;
+
+      >* {
+        width: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      >input {
+        height: 40px;
+        padding: 5px 10px;
+        border: 2px solid #0a0f3c;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      >button {
+        margin-block: 10px;
+        height: 40px;
+        background-color: #0a0f3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.5s;
+      }
+
+      >button:hover {
+        background-color: #7a0623;
+      }
+
+      >ul {
+        display: flex;
+        flex-wrap: wrap;
+
+
+        >li {
+          width: 100%;
+          list-style-type: none;
+          margin: 10px 0;
+          background-color: #e6e6e6;
+          border-left: 5px solid #0a0f3c;
+          display: flex;
+          height: 60px;
+          position: relative;
+          transition: 0.5s;
+          border-radius: 5px;
+          overflow: hidden;
+
+          >* {
+            display: block;
+          }
+
+          >.line {
+            display: flex;
+            width: 0;
+            height: 3px;
+            border-radius: 2px;
+            background-color: #7a0623;
+            position: absolute;
+            left: 0;
+            top: 29px;
+            transition: 0.5s;
+          }
+
+          >h3 {
+            width: 350px;
+            display: flex;
+            align-items: center;
+            text-transform: capitalize;
+            padding-left: 10px;
+          }
+
+          >span {
+            width: 50px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    .left {
+      transform: translateX(-1500px);
+    }
+
+    #garbage {
+      width: 300px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      background-color: #7a0623;
+      padding: 10px;
+      border-bottom-left-radius: 10px;
+
+      >li {
+        color: white;
+        border-bottom: 1px solid black;
+        display: flex;
+        justify-content: space-between;
+        height: 50px;
+        align-items: center;
+        font-family: Arial, Helvetica, sans-serif;
+        padding-inline: 10px;
+
+        >span {
+          cursor: pointer;
+        }
+      }
+    }
+
+    .hide {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <img class="logo" src="https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"
+    alt="Barcelona Logo" />
+
+  <div class="todo">
+    <input autofocus type="text" placeholder="write your list😎">
+    <button>add</button>
+    <ul id="list"></ul>
+  </div>
+
+  <ul id="garbage"></ul>
+
+  <script>
+    const inp = document.querySelector('.todo>input')
+    const btn = document.querySelector('.todo>button')
+    const list = document.querySelector('#list')
+    const deleteList = document.getElementById('garbage')
+
+    btn.addEventListener('click', () => {
+      let temp = inp.value
+      if (temp === '') {
+        alert('write something!')
+      } else {
+        myAdd(temp)
+      }
+    })
+
+    function myAdd(temp) {
+      let li = document.createElement('li')
+      li.innerHTML = `
+        <span class=line></span>
+        <input class=hide type=text />
+        <h3>${temp}</h3>
+        <span><input type="checkbox" onchange='fnDel(this)'></span>
+        <span onclick=myEdit(this)>📝</span>
+        <span onclick=myDel(this)>❌</span>
+      `
+      list.appendChild(li)
+      inp.value = null
+      inp.focus()
+    }
+
+    function fnDel(s) {
+      if (s.checked) {
+        s.parentElement.previousElementSibling.previousElementSibling.style.width = '300px'
+      } else {
+        s.parentElement.previousElementSibling.previousElementSibling.style.width = '0'
+      }
+    }
+
+    let num = 1
+    function myEdit(s) {
+      if (num % 2) {
+        s.parentElement.children[1].classList.remove('hide')
+        s.parentElement.children[1].value = s.parentElement.children[2].innerText
+        s.innerHTML = '✅'
+      } else {
+        s.parentElement.children[1].classList.add('hide')
+        s.innerHTML = '📝'
+        s.parentElement.children[2].innerText = s.parentElement.children[1].value
+      }
+      num++
+    }
+
+    function myDel(s) {
+      if (confirm('sure?')) {
+        let oldText = s.parentElement.children[2].innerText
+        s.parentElement.classList.add('left')
+        setTimeout(() => {
+          s.parentElement.remove()
+        }, 500);
+
+
+        let li = document.createElement('li')
+        li.innerHTML = `
+                <b>${oldText}</b>
+                <span onclick='addAgain(this)'>✅</span>
+            `
+        deleteList.appendChild(li)
+      }
+    }
+
+    function addAgain(s) {
+      let temp = s.previousElementSibling.innerText
+      s.parentElement.remove()
+      myAdd(temp)
+    }
+
+
+  </script>
+</body>
+
+</html>
